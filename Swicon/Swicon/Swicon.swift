@@ -88,11 +88,11 @@ public class Swicon {
             var iconImage = UIGraphicsGetImageFromCurrentImageContext()
             UIGraphicsEndImageContext()
             
-            if(iconImage.respondsToSelector(Selector("imageWithRenderingMode:"))){
-                iconImage = iconImage.imageWithRenderingMode(UIImageRenderingMode.AlwaysOriginal)
+            if(iconImage!.respondsToSelector(Selector("imageWithRenderingMode:"))){
+                iconImage = iconImage!.imageWithRenderingMode(UIImageRenderingMode.AlwaysOriginal)
             }
             
-            return iconImage
+            return iconImage!
         } else {
             return UIImage()
         }
@@ -213,7 +213,7 @@ private func loadFontFromFile(fontFileName: String, forClass: AnyClass, isCustom
     if fontURL != nil {
         let data = NSData(contentsOfURL: fontURL!)!
         let provider = CGDataProviderCreateWithCFData(data)
-        let font = CGFontCreateWithDataProvider(provider)!
+        let font = CGFontCreateWithDataProvider(provider!)
         
         if (!CTFontManagerRegisterGraphicsFont(font, nil)) {
             NSLog("Failed to load font \(fontFileName)");
