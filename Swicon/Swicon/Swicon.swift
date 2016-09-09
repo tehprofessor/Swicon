@@ -14,9 +14,9 @@ import Dispatch
 public class Swicon {
     
     public static let instance = Swicon()
-    
-    private let load_queue = DispatchQueue(label: "com.swicon.font.load.queue", attributes: DispatchQueueAttributes.serial)
-    
+
+    private let load_queue = DispatchQueue(label: "com.swicon.font.load.queue")
+
     private var fontsMap :[String: IconFont] = [
         "fa": FontAwesomeIconFont(),
         "gm": GoogleMaterialIconFont()
@@ -70,7 +70,7 @@ public class Swicon {
         return nil
     }
     
-    public func getUIImage(_ iconName: String, iconSize: CGFloat, iconColour: UIColor = UIColor.black(), imageSize: CGSize) -> UIImage {
+    public func getUIImage(_ iconName: String, iconSize: CGFloat, iconColour: UIColor = UIColor.black, imageSize: CGSize) -> UIImage {
         let style = NSMutableParagraphStyle()
         style.alignment = NSTextAlignment.left
         style.baseWritingDirection = NSWritingDirection.leftToRight
@@ -88,7 +88,7 @@ public class Swicon {
             var iconImage = UIGraphicsGetImageFromCurrentImageContext()
             UIGraphicsEndImageContext()
             
-            if((iconImage?.responds(to: Selector("imageWithRenderingMode:"))) != nil){
+            if((iconImage?.responds(to: #selector(UIImage.withRenderingMode(_:)))) != nil){
                 iconImage = iconImage?.withRenderingMode(UIImageRenderingMode.alwaysOriginal)
             }
             
@@ -202,17 +202,18 @@ private func loadFontFromFile(_ fontFileName: String, forClass: AnyClass, isCust
     let identifier = bundle.bundleIdentifier
     
     if isCustom {
-        fontURL = Bundle.main.urlForResource(fontFileName, withExtension: "ttf")
+
+        fontURL = Bundle.main.url(forResource: fontFileName, withExtension: "ttf")
     } else if identifier?.hasPrefix("org.cocoapods") == true {
         // If this framework is added using CocoaPods and it's not a custom font, resources is placed under a subdirectory
-        fontURL = bundle.urlForResource(fontFileName, withExtension: "ttf", subdirectory: "Swicon.bundle")
+      fontURL = Bundle.main.url(forResource: fontFileName, withExtension: "ttf", subdirectory: "Swicon.bundle")
     } else {
-        fontURL = bundle.urlForResource(fontFileName, withExtension: "ttf")
+      fontURL = bundle.url(forResource: fontFileName, withExtension: "ttf")
     }
     
     if fontURL != nil {
         let data = try! Data(contentsOf: fontURL!)
-        let provider = CGDataProvider(data: data)
+        let provider = CGDataProvider(data: data as CFData)
         let font = CGFont(provider!)
         
         if (!CTFontManagerRegisterGraphicsFont(font, nil)) {
